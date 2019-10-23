@@ -31,7 +31,6 @@ const getHDNode = function(xprv, path) {
   const node = bip32.fromBase58(xprv);
   node.network = network;
   return node.derivePath(path);
-  return bitcoin.ECPair.fromPrivateKey(derivedNode.privateKey);
 }
 
 const getScriptInfo = function(pubkeys) {
