@@ -12,6 +12,17 @@ const userXprv = 'xprv9s21ZrQH143K47RNGfDmMNf5ML83o2etex9NWtZZZyTaDzdCWrcFwDTG6v
 const backupXprv = 'xprv9s21ZrQH143K3pj8pbqD5Fdx4h4ufahHktJpX2EhSuwSNK6Vu5c3ZofXKoH6BRXtgndczS2KwFT63tCHV5Dyi8aB395cqaBPvv26aC5t31a';
 const bitgoPublicKey = 'xpub661MyMwAqRbcGeNRSDceUgor9ZrqcYJWyN6kHfXu54CTrx3ANvGvodskCScFLZKceRTr3s1x1HunGVDUPRzMWeCaYTRb94s6NiDKaPSf1Mq';
 const derivationPath = 'm/0/0/10/2';
+// Below is the input transaction (the unspent, which you will be spending)
+const inputData = {
+  hash: '7071ad8b88cf58b575768580c64890cb71b5fac096476125a24322a268eb46c0',
+  index: 1,
+  value: 100000,
+};
+// And the destination info:
+const destinationData = {
+  address: '2NBuJHF2ujAM9RrxqK8MpUeXaRRKL6PCBUp',
+  value: 80000,
+};
 // End Todo
 
 const network = net === 'mainnet' ? bitcoin.networks.bitcoin : bitcoin.networks.testnet;
@@ -38,22 +49,10 @@ const backupSigner = bitcoin.ECPair.fromPrivateKey(backupNode.privateKey, { netw
 
 const pubkeys = [userNode, backupNode, bitgoNode].map(node => node.publicKey);
 const scriptInfo = getScriptInfo(pubkeys);
-
-const inputData = {
-  hash: '7071ad8b88cf58b575768580c64890cb71b5fac096476125a24322a268eb46c0',
-  index: 1,
-  redeemScript: scriptInfo.p2sh.redeem.output,
-  witnessScript: scriptInfo.p2wsh.redeem.output,
-  value: 100000,
-};
-
-const destinationData = {
-  address: '2NBuJHF2ujAM9RrxqK8MpUeXaRRKL6PCBUp',
-  value: 80000,
-};
+inputData.redeemScript = scriptInfo.p2sh.redeem.output;
+inputData.witnessScript = scriptInfo.p2wsh.redeem.output;
 
 const txb = new bitcoin.TransactionBuilder(network);
-
 txb.addInput(inputData.hash, inputData.index);
 txb.addOutput(destinationData.address, destinationData.value);
 txb.sign(0, userSigner, inputData.redeemScript, null, inputData.value, inputData.witnessScript);
